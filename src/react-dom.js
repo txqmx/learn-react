@@ -21,7 +21,7 @@ function createDOM(vdom) {
     let {type, props} = vdom  // h1 props={className, style, children}
     let dom = ''
     if(typeof type === 'function'){
-        return updateFunctionComponent(vdom)
+        return type.prototype.isReactComponent? updateClassComponent(vdom) : updateFunctionComponent(vdom)
     }else { // 如果类型是一个普通的字符串，说明是一个原生的虚拟Dom节点，比如h1 span div
         dom = document.createElement(type) // 创建一个h1的真实dom
     }
@@ -45,6 +45,13 @@ function createDOM(vdom) {
 function updateFunctionComponent(vdom) {
     let {type,props} = vdom
     let renderVirtualDOM = type(props) // type=FunctionComponent
+    return createDOM(renderVirtualDOM)
+}
+
+function updateClassComponent(vdom) {
+    let {type:ClassComponent,props} = vdom
+    let classInstance = new ClassComponent(props)
+    let renderVirtualDOM = classInstance.render() // type=FunctionComponent
     return createDOM(renderVirtualDOM)
 }
 

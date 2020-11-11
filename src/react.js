@@ -1,3 +1,5 @@
+import Component from "./Component";
+
 /*
 * @param {*} type 元素类型
 * @param {*} config 配置对象
@@ -22,5 +24,6 @@ function createElement(type, config, children) { // ...children 都是数组
 }
 
 export default {
-    createElement
+    createElement,
+    Component
 }
