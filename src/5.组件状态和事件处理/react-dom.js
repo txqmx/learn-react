@@ -1,5 +1,3 @@
-import {addEvent} from "./event";
-
 /*
 * 把虚拟dom转成真DOM并且插入到parentDOM里面
 * @param {*} vdom 虚拟dom react元素 也就是一个js对象
@@ -86,10 +84,6 @@ function updateProps(dom, props) {
             for(let attr in style){
                 dom.style[attr] = style[attr]
             }
-        }else if(key.startsWith('on')){
-            // dom=button onclick handClick
-            addEvent(dom, key.toLocaleLowerCase(), props[key])
-
         }else {
             dom[key] = props[key]
         }
