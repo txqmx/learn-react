@@ -109,13 +109,12 @@ class Component {
 
         // 源码里是这样做的，重新render，得到新的虚拟DOM，然后和老的虚拟DOM进行对比
         // 如果说有子组件原来有，现在不在需要了，则会触发组件的componentWillUnmount
-        let extraArgs = this.getSnapshotBeforeUpdate && this.getSnapshotBeforeUpdate()
         let newDom = createDOM(newVdom)
         let oldDom = this.dom
         oldDom.parentNode.replaceChild(newDom, oldDom)
         this.dom = newDom
         if(this.componentDidUpdate){
-            this.componentDidUpdate(this.props, this.state, extraArgs)
+            this.componentDidUpdate()
         }
     }
 
