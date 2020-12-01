@@ -17,42 +17,36 @@ function useState(initialState) {
     return [hookStates[hookIndex++], setState]
 }
 
-
+let lastCallback, lastCallbackDeps
 function useCallback(callback, deps) {
-    if(hookStates[hookIndex]){
-        let [lastCallback, lastCallbackDeps] = hookStates[hookIndex]
+    if(lastCallbackDeps){
         let same = deps.every((item, index) => item === lastCallbackDeps[index])
-        if(same){ // 如果老的依赖和新的依赖都相同，则直接返回老的，如果不相同返回新的
-            hookIndex++
-            return lastCallback
-        } else {
-            hookStates[hookIndex++] = [callback, deps]
-            return callback
+        if(!same){
+            lastCallback = callback
+            lastCallbackDeps = deps
         }
     } else {
-        hookStates[hookIndex++] = [callback, deps]
-        return callback
+        lastCallback = callback
+        lastCallbackDeps = deps
     }
+    return lastCallback
 }
 
+let lastMemo, lastMemoDeps
 function useMemo(factory, deps) {
-    if(hookStates[hookIndex]){
-        let [memo, lastDeps] = hookStates[hookIndex]
-        let same = deps.every((item, index) => item === lastDeps[index])
-        if(same){ // 如果老的依赖和新的依赖都相同，则直接返回老的，如果不相同返回新的
-            hookIndex++
-            return memo
-        } else {
-            let newMemo = factory()
-            hookStates[hookIndex++] = [newMemo, deps]
-            return newMemo
+    if(lastMemoDeps){
+        let same = deps.every((item, index) => item === lastMemoDeps[index])
+        if(!same){
+            lastMemo = factory()
+            lastMemoDeps = deps
         }
     } else {
-        let newMemo = factory()
-        hookStates[hookIndex++] = [newMemo, deps]
-        return newMemo
+        lastMemo = factory()
+        lastMemoDeps = deps
     }
+    return lastMemo
 }
+
 
 
 /*
@@ -70,8 +64,6 @@ function Child(props) {
 let MemoChild = React.memo(Child)
 
 function App() {
-    // 如果一旦进入函数组件，索引先归0
-    // 每调用一个hook 索引+1
     let [number, setNumber] = useState(0)
     let [name, setName] = useState('liu')
     const handleClick = useCallback(()=> setNumber(number+1), [number])
@@ -81,7 +73,7 @@ function App() {
 
     return (
         <div>
-            <input type="text" value={name} onChange={event =>setName(event.target.value)}></input>
+            <input type="text" value={name} onChange={event =>{event => setName(event.target.name)}}></input>
             <MemoChild handleClick={handleClick} data={data}/>
         </div>
     )
