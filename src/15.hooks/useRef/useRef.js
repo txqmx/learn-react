@@ -7,21 +7,18 @@ import ReactDOM from 'react-dom'
 * forwardRef
 * */
 
-function useImperativeHandle(forwardRef, factory) {
-    forwardRef.current = factory()
-}
-
+let lastInputRef
 function Child(props, forwardRef){
-    const inputRef = React.useRef()
-    // 第一个参数是转发的forwardRef对象，第二个是工厂函数，返回一个对象
-    useImperativeHandle(forwardRef, () => ({
-        focus() {
-            inputRef.current.focus()
-        }
-    }))
+    // 在Child组件多次渲染的时候，ref对象始终是同一个
+    // let inputRef = useRef()
+    // console.log(lastInputRef === inputRef);
+    // lastInputRef = inputRef
+    // const getFocus = () => {
+    //     inputRef.current.focus()
+    // }
     return (
         <div>
-            <input type="text" ref={inputRef}/>
+            <input type="text" ref={forwardRef}/>
             <button onClick={props.getFocus}>获取焦点</button>
         </div>
     )
@@ -32,8 +29,10 @@ const ForwardedChild = React.forwardRef(Child)
 function Parent(){
     let [number, setNumber] = useState(0)
     let inputRef = React.useRef()
+    console.log(lastInputRef === inputRef);
+    lastInputRef = inputRef
     const getFocus = () => {
-        inputRef.current.focus() // current 指向useImperativeHandle 第二个函数返回的对象
+        inputRef.current.focus()
     }
     return (
         <div>
